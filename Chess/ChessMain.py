@@ -17,13 +17,13 @@ Initialize a global dictionary of images. This will be called once in the main
 """
 
 def loadImages():
-    pieces = ['wp','wR','wB','wN','wQ','wK','bp','bR','bB','bN','bQ','bK']
+    pieces = ['wP','wR','wB','wN','wQ','wK','bP','bR','bB','bN','bQ','bK']
     for piece in pieces:
         IMAGES[piece] = p.transform.scale(
             p.image.load("images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)
         )
 
-    #Note: we can get our image from images at all times by saying IMAGES['wp']
+    #Note: we can get our image from images at all times by saying IMAGES['wP']
 '''
 The main driver for our code. This will basically handle I/O (user input and updating the graphics)
 '''
@@ -34,21 +34,24 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color('white'))
     gs = ChessEngine.GameState()
+    validMoves = gs.getValidMoves()
+    newMoveMade = False # Flag variable that tells us a new move has been made and validMoves has to be regenerated
+
     loadImages() #only do this once
     running = True
     sqSelected = () # no square is initially selected, keeps track of the last click of the user
     playerClicks = [] # keep track of player clicks (two tuples: [(x0,y0),(x1,y1)])
-    drawGameState(screen, gs)
+
     while running:
-        drawGameState(screen, gs)
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            #mouse handler
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos() # (x,y) location of mouse
                 col = location[0] // SQ_SIZE
                 row = location[1] // SQ_SIZE
-                if sqSelected == (row,col): # user selected same square twice
+                if gs.notValidSquare(row,col,sqSelected,playerClicks): # user selected same square twice or wrong color piece
                     sqSelected = () #deselect
                     playerClicks = [] # clear player clicks, removes history as it's not needed
                 else:
@@ -57,11 +60,25 @@ def main():
                 if len(playerClicks)  == 2: #action after start and end square selected
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1],gs.board)
                     print(move.getChessNotation())
-                    gs.makeMove(move)
+                    if move in validMoves:
+                        newMoveMade = True
+                        gs.makeMove(move)
                     sqSelected = () #reset user clicks
                     playerClicks = [] #reset Player Clicks
-            clock.tick(MAX_FPS)
-            p.display.flip()
+                print(playerClicks)
+                print(gs.whiteToMove)
+            # key handles
+            elif e.type == p.KEYDOWN :
+                if e.key == p.K_z:
+                    gs.undoMove()
+                    newMoveMade = True # logically a move has been made and the flag should be changes
+                print(playerClicks)
+        if newMoveMade:
+            validMoves = gs.getValidMoves()
+            newMoveMade = False
+        drawGameState(screen, gs)
+        clock.tick(MAX_FPS)
+        p.display.flip()
 
 '''
 Responsible for the graphics within a current game state
