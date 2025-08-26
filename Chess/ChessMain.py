@@ -51,11 +51,14 @@ def main():
                 location = p.mouse.get_pos() # (x,y) location of mouse
                 col = location[0] // SQ_SIZE
                 row = location[1] // SQ_SIZE
-                if gs.notValidSquare(row,col,sqSelected,playerClicks): # user selected same square twice or wrong color piece
+                if sqSelected == (row,col): # user selected same square twice or wrong color piece
                     sqSelected = () #deselect
                     playerClicks = [] # clear player clicks, removes history as it's not needed
                 else:
                     sqSelected = (row, col)
+                    # if gs.board[playerClicks[0][0]][playerClicks[0][1]][0] == gs.board[playerClicks[1][0]][playerClicks[1][1]][0]:
+                    #     #checks whether the player has switched pieces rather than playing a move
+                    #     playerClicks = [] #before appending sqSelected just make clear it so the next non-white piece selected counts as the move
                     playerClicks.append(sqSelected)
                 if len(playerClicks)  == 2: #action after start and end square selected
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1],gs.board)
@@ -63,8 +66,10 @@ def main():
                     if move in validMoves:
                         newMoveMade = True
                         gs.makeMove(move)
-                    sqSelected = () #reset user clicks
-                    playerClicks = [] #reset Player Clicks
+                        sqSelected = () #reset user clicks
+                        playerClicks = [] #reset Player Clicks
+                    else:
+                        playerClicks = [sqSelected]
                 print(playerClicks)
                 print(gs.whiteToMove)
             # key handles

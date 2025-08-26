@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d132ad99-115e-4bbf-a527-ec11a2dde056" name="Changes" comment="Added functionality to make moves using mouse presses. In ChessEngine I added a move class and a makeMove function under GameState. In ChessMain I added the logic for using MOUSEBUTTONDOWN to trigger moves when appropriate.">
+    <list default="true" id="d132ad99-115e-4bbf-a527-ec11a2dde056" name="Changes" comment="Added piece moving functionality for rook,knight,bishop.&#10;Removed logical errors in NotValidState() function&#10;Still have to remove the error where we have to double click to cancel a move">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Chess/ChessEngine.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/ChessEngine.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Chess/ChessMain.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/ChessMain.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Chess/images/bp.png" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/images/bP.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Chess/images/wp.png" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/images/wP.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +84,7 @@
       <updated>1756045286299</updated>
       <workItem from="1756045314976" duration="609000" />
       <workItem from="1756059327675" duration="24562000" />
-      <workItem from="1756232118156" duration="2596000" />
+      <workItem from="1756232118156" duration="3964000" />
     </task>
     <task id="LOCAL-00001" summary="Commit">
       <option name="closed" value="true" />
@@ -112,7 +110,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756125896961</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Added piece moving functionality for rook,knight,bishop.&#10;Removed logical errors in NotValidState() function&#10;Still have to remove the error where we have to double click to cancel a move">
+      <option name="closed" value="true" />
+      <created>1756234912444</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1756234912444</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -122,10 +128,11 @@
     <MESSAGE value="Commit" />
     <MESSAGE value="Made the basic classes and functions to draw the board and all of the pieces on it" />
     <MESSAGE value="Added functionality to make moves using mouse presses. In ChessEngine I added a move class and a makeMove function under GameState. In ChessMain I added the logic for using MOUSEBUTTONDOWN to trigger moves when appropriate." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added functionality to make moves using mouse presses. In ChessEngine I added a move class and a makeMove function under GameState. In ChessMain I added the logic for using MOUSEBUTTONDOWN to trigger moves when appropriate." />
+    <MESSAGE value="Added piece moving functionality for rook,knight,bishop.&#10;Removed logical errors in NotValidState() function&#10;Still have to remove the error where we have to double click to cancel a move" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added piece moving functionality for rook,knight,bishop.&#10;Removed logical errors in NotValidState() function&#10;Still have to remove the error where we have to double click to cancel a move" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Chess$ChessMain.coverage" NAME="ChessMain Coverage Results" MODIFIED="1756234549133" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
+    <SUITE FILE_PATH="coverage/Chess$ChessMain.coverage" NAME="ChessMain Coverage Results" MODIFIED="1756235959865" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
     <SUITE FILE_PATH="coverage/Chess$ChessEngine.coverage" NAME="ChessEngine Coverage Results" MODIFIED="1756216708306" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
   </component>
 </project>

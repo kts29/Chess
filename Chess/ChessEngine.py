@@ -180,10 +180,21 @@ class GameState:
 
 
     def getKingMoves(self,r,c,moves):
-        pass
+        enemyPieceIndicator = 'b' if self.whiteToMove else 'w'
+        for dr in (-1,0,1):
+            for dc in (-1,0,1):
+                if dr == dc == 0: continue
+                new_r = r + dr
+                new_c = c + dc
+                if 0 <= new_r < len(self.board) and 0 <= new_c < len(self.board[r]):  # check if its in loop
+                    curr = self.board[new_r][new_c]
+                    if curr == '--' or curr[0] == enemyPieceIndicator:
+                        moves.append(Move((r, c), (new_r, new_c), self.board))
+
 
     def getQueenMoves(self,r,c,moves):
-        pass
+        self.getRookMoves(r, c,moves)
+        self.getBishopMoves(r, c, moves)
 
 
 class Move:
