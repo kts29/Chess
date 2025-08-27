@@ -12,8 +12,8 @@ class GameState:
         #second character represents the type of the piece
         #could use numpy arrays for better engine speed
         self.board = [
-            ["bR","bN","bB","bQ","bK","bB","bN","bR"],
-            ["bP","bP","bP","bP","bP","bP","bP","bP"],
+            ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
+            ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
@@ -21,37 +21,50 @@ class GameState:
             ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         ]
-        self.whiteToMove = True
-        self.moveLog = []
         self.moveFunction = {'P' : self.getPawnMoves, 'N' : self.getKnightMoves,'B' : self.getBishopMoves,
                              'Q':self.getQueenMoves,'K' : self.getKingMoves,'R' : self.getRookMoves}
+        self.whiteToMove = True
+        self.moveLog = []
+        self.whiteKingSquare = (7,4)
+        self.blackKingSquare = (0,4)
+        self.pins = []
+        self.checks = []
+        self.checkMate = False
+        self.staleMate = False
 
-    def notValidSquare(self, row, col, sqSelected, playerClicks):
-        """
-        Checks whether the selected square is invalid for the current player.
-        Conditions:
-          1. Player clicked the same square again.
-          2. First click is on an empty square or on the opponent's piece.
-        """
-        return (
-                sqSelected == (row, col) or
-                (
-                        playerClicks.count == 0 and (
-                        self.board[row][col] == '--' or
-                        (self.board[row][col][0] == 'b' and self.whiteToMove) or
-                        (self.board[row][col][0] == 'w' and not self.whiteToMove)
-                )
-                )
-        )
+    # def notValidSquare(self, row, col, sqSelected, playerClicks):
+    #     """
+    #     Checks whether the selected square is invalid for the current player.
+    #     Conditions:
+    #       1. Player clicked the same square again.
+    #       2. First click is on an empty square or on the opponent's piece.
+    #     """
+    #     return (
+    #             sqSelected == (row, col) or
+    #             (
+    #                     playerClicks.count == 0 and (
+    #                     self.board[row][col] == '--' or
+    #                     (self.board[row][col][0] == 'b' and self.whiteToMove) or
+    #                     (self.board[row][col][0] == 'w' and not self.whiteToMove)
+    #             )
+    #             )
+    #     )
 
     def makeMove(self,move):
         """
         Takes a Move as a parameter and executes it, need to update it for castling, pawn promotion, en passant
         """
+        if move.pawnPromotion:
+            self.board[move.endRow][move.endCol]= self.board[move.startRow][move.startCol][0] + 'Q' # Auto-Queen, strings are immutable in python so I used concatenation for the string
+        else:
+            self.board[move.endRow][move.endCol] = move.pieceMoved
         self.board[move.startRow][move.startCol] = '--'
-        self.board[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move) # logging the move to undo it later or to show the history fo the game
         self.whiteToMove = not self.whiteToMove # swap players
+        if move.pieceMoved == 'wK':
+            self.whiteKingSquare = (move.endRow,move.endCol)
+        if move.pieceMoved == 'bK':
+            self.blackKingSquare = (move.endRow,move.endCol)
         # self.printBoard()
     '''
     Prints board in the current state, for debugging
@@ -67,13 +80,64 @@ class GameState:
             self.board[move.startRow][move.startCol] = move.pieceMoved
             self.board[move.endRow][move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove
+            if move.pieceMoved == 'wK':
+                self.whiteKingSquare = (move.startRow, move.startCol)
+            if move.pieceMoved == 'bK':
+                self.blackKingSquare = (move.startRow, move.startCol)
 
 
     '''
     All moves considering checks
     '''
     def getValidMoves(self):
-        return self.getPossibleMoves() # for now lets not worry about it
+        #1.)Generate all moves
+        moves = self.getPossibleMoves() # for now lets not worry about it
+        #2.)For every move make the move
+        for i in range(len(moves) - 1,-1,-1):
+            self.makeMove(moves[i])
+            #3.)For every move generate all moves in response for the opponent
+            self.whiteToMove = not self.whiteToMove #Normally after making a move we switch turns so the opp can play but here we switch it back to know whether we are in check
+            if self.inCheck():
+                # 4.)Check if my king is in check for each move and if it is in check remove that from moves
+                # 5.)If my king is being attacked then it's not a valid move
+                moves.remove(moves[i])
+            self.whiteToMove = not self.whiteToMove #switch it back to the opponent so they ccan play
+            self.undoMove() #we don't actually wanna make the move
+        if len(moves) == 0:
+            if self.inCheck():
+                self.checkMate = True
+            else:
+                self.staleMate = True
+        else:
+            self.staleMate = False
+            self.checkMate = False
+        return moves
+
+
+        return moves
+    '''
+    Find out whether current player is under check
+    '''
+    def inCheck(self):
+        if self.whiteToMove:
+            return self.sqUnderAttack(self.whiteKingSquare[0],self.whiteKingSquare[1])
+        else:
+
+            return self.sqUnderAttack(self.blackKingSquare[0], self.blackKingSquare[1])
+    '''
+    Find out whether a square is under attack
+    '''
+    def sqUnderAttack(self,r,c):
+        #Switch to the opponents turn
+        self.whiteToMove = not self.whiteToMove
+        oppmoves = self.getPossibleMoves()
+        #Switch back once I get the moves
+        self.whiteToMove = not self.whiteToMove
+        for move in oppmoves:
+            if move.endRow == r and move.endCol == c:
+                return True
+        return False
+
     '''
     All moves not considering checks
     '''
@@ -212,6 +276,11 @@ class Move:
             self.pieceMoved = board[self.startRow][self.startCol]
             self.pieceCaptured = board[self.endRow][self.endCol]
             self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol # all moves have a unique moveID (hash function)
+            if (self.pieceMoved == 'wP' and self.endRow == 0) or (self.pieceMoved == 'bP' and self.endRow ==7) :
+                self.pawnPromotion = True
+            else:
+                self.pawnPromotion = False
+
             # print(self.moveID)
     '''
     Overriding the equals method
